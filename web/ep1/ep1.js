@@ -176,7 +176,7 @@ function drawFE() {
   P.y = [lo - pad, hi + pad];
   P.clear(); P.axes({ xt: 4, yt: 0, xl: "magnetisation m", yl: "f(m) − f(0)" });
   P.line([[-1, 0], [1, 0]], C.line, 1, 1, [3, 4]);
-  P.fill(pts, t < 4 ? C.crit : C.hot, 0.12, P.y[1]);
+  P.fill(pts, t < 4 ? C.crit : C.hot, 0.12);
   P.line(pts, t < 4 ? C.crit : C.hot, 2.5);
   // local minima
   const mins = [];

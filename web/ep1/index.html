@@ -175,7 +175,7 @@ to remember are the low-energy states,
 $$E(s) = -\tfrac12\sum_{i\neq j} W_{ij}\, s_i s_j,$$
 $$s_i \leftarrow \operatorname{sign}\Big(\sum_j W_{ij} s_j\Big).$$
 Each update can only lower $E$, so a damaged picture rolls downhill into the nearest stored memory. Hebb's rule
-$W=\frac1N\sum_\mu \xi^\mu\xi^{\mu\top}$ gets confused by similar drawings; the pseudo-inverse rule removes their
+$W=\frac1N\sum_\mu \xi^\mu\xi^{\mu\top}$ handles a few distinct drawings but gets confused when they are similar or numerous (try storing 5); the pseudo-inverse rule removes their
 overlap first. Hopfield shared the 2024 Nobel Prize in Physics with Geoffrey Hinton for this line of work.</p>
 <div class="widget" id="hop-widget">
   <div class="hop">
