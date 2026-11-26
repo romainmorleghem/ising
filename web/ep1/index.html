@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Ising model: the key results</title>
+<meta name="description" content="Ising, episode 1: interactive companion. A live 2D Ising lattice you can heat, cool and draw on; Onsager's exact magnetisation against simulation and mean field; the free-energy landscape; block spins; critical opalescence; and a Hopfield memory.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<main>
+<p class="hint"><a href="../">Ising</a> · Episode 1</p>
+<h1>The Ising model: the key results</h1>
+<p class="lede">Put a tiny magnet on every square of a grid. Each one only cares about its four neighbours, yet below
+one precise temperature, $T_c = 2/\ln(1+\sqrt2)\approx 2.269$, billions of them agree to point the same way.
+This page lets you run the model yourself, and see why that temperature is so strange.</p>
+<video class="video" controls preload="metadata" playsinline poster="poster.jpg"><source src="ep01_1080p.mp4" type="video/mp4">Your browser does not support HTML5 video.</video>
+<ol class="chapters" id="chapters">
+  <li>Cold open: melting and freezing</li>
+  <li>The model: spins, energy, temperature</li>
+  <li>1D: Ising gets it wrong (1925)</li>
+  <li>2D: Peierls fixes it (1936)</li>
+  <li>Mean field: the bowl splits</li>
+  <li>Onsager (1944) and Yang (1952)</li>
+  <li>At the critical point: no typical size</li>
+  <li>Universality and critical opalescence</li>
+  <li>Legacy: Hopfield's memories, recap</li>
+</ol>
+<nav class="toc" aria-label="Sections"><a href="#s1">1 · Live lattice</a><a href="#s2">2 · Magnetisation</a><a href="#s3">3 · Landscape</a><a href="#s4">4 · Block spins</a><a href="#s5">5 · What light sees</a><a href="#s6">6 · Memory</a><a href="#s7">7 · Going further</a><a href="#s8">8 · History</a></nav>
+
+<!-- ============================================================ 1. simulator -->
+<h2 id="s1"><span class="num">1</span>The lattice, live</h2>
+<p>Each square is a spin, up (<b style="color:var(--up)">gold</b>) or down (<b style="color:var(--down)">blue</b>).
+Neighbours that agree lower the energy; a field $h$ favours one colour:
+$$H = -\sum_{\langle ij\rangle} s_i s_j \;-\; h\sum_i s_i, \qquad P(\text{configuration}) \propto e^{-H/T}.$$
+The <em>Metropolis</em> rule picks a spin and flips it with probability $\min(1, e^{-\Delta E/T})$: downhill
+always, uphill sometimes, more often when hot. Cool the lattice below $T_c$ and watch domains grow; heat it and it
+melts into noise. Draw an island with the mouse (or your finger) and see whether it shrinks or survives.</p>
+<div class="widget" id="sim-widget">
+  <div class="sim">
+    <div class="lattice">
+      <canvas id="lat" class="px paint" width="256" height="256" aria-label="Ising lattice. Draw on it to set spins."></canvas>
+    </div>
+    <div class="side">
+      <div class="stats" aria-live="off">
+        <div>temperature<b id="st-T">–</b></div>
+        <div>magnetisation $m$<b id="st-m">–</b></div>
+        <div>energy / spin<b id="st-e">–</b></div>
+        <div>exact $|m|$<b id="st-x">–</b></div>
+      </div>
+      <canvas id="trace" aria-label="Magnetisation over time"></canvas>
+      <div class="controls">
+        <label>$T$ <span class="slider"><input type="range" id="T" min="0.5" max="5" step="0.01" value="2.27" aria-label="temperature"><span class="tick" id="tc-tick" title="T_c"></span></span><output id="T-o"></output></label>
+        <button id="snap">Snap to $T_c$</button>
+        <label>field $h$ <input type="range" id="h" min="-1" max="1" step="0.01" value="0" aria-label="external field"><output id="h-o"></output></label>
+        <span class="seg" id="algo" role="group" aria-label="algorithm"><button data-a="metro" class="on" aria-pressed="true">Metropolis</button><button data-a="wolff" aria-pressed="false">Wolff clusters</button></span>
+        <label>speed <input type="range" id="spf" min="1" max="30" step="1" value="4" aria-label="sweeps per frame"><output id="spf-o"></output></label>
+        <label>size <select id="size" aria-label="lattice size"><option>128</option><option selected>256</option><option>512</option></select></label>
+      </div>
+      <div class="controls">
+        <button id="rand">Randomise</button><button id="allup">All up</button><button id="quench">Quench to $T=1.5$</button>
+        <button id="pause" aria-pressed="false">Pause</button>
+      </div>
+      <div class="controls">
+        <span>brush</span>
+        <span class="seg" id="brush" role="group" aria-label="brush colour"><button data-b="1" class="on" aria-pressed="true">▲ up</button><button data-b="-1" aria-pressed="false">▼ down</button><button data-b="0" aria-pressed="false">off</button></span>
+        <label>radius <input type="range" id="rad" min="1" max="40" step="1" value="12" aria-label="brush radius"><output id="rad-o"></output></label>
+      </div>
+      <p class="hint" id="sim-hint"></p>
+    </div>
+  </div>
+  <p class="hint">Speed is in sweeps per frame (one sweep = one update attempt per spin). Near $T_c$ Metropolis
+  struggles: big domains take forever to turn over (<em>critical slowing down</em>). Wolff flips whole clusters at once
+  and does not care. At $h=0$ the Wolff mode flips the colours back when the whole lattice changes sign, which is an
+  exact symmetry, so the picture does not flash.</p>
+</div>
+
+<!-- ============================================================ 2. m(T) -->
+<h2 id="s2"><span class="num">2</span>Magnetisation: simulation, exact, mean field</h2>
+<p>Below $T_c$ the lattice picks a colour: the spontaneous magnetisation $m$ is not zero. Onsager (1944) and Yang
+(1952) found it exactly,
+$$m(T) = \big(1-\sinh(2/T)^{-4}\big)^{1/8}\quad (T<T_c),$$
+so $m \sim (T_c-T)^{1/8}$ near the transition. The cheap <em>mean-field</em> guess, where every spin feels the
+average of its 4 neighbours, solves $m=\tanh(4m/T)$: right shape, wrong place ($T_c=4$), wrong exponent ($1/2$).
+The orange dot is your live simulator.</p>
+<div class="widget" id="mT-widget">
+  <canvas id="mT"></canvas>
+  <div class="controls">
+    <span class="seg" id="mT-seg" role="group" aria-label="quantity"><button data-q="m" class="on" aria-pressed="true">magnetisation $|m|$</button><button data-q="C" aria-pressed="false">specific heat $C$</button></span>
+  </div>
+  <div class="legend">
+    <span><i class="swatch" style="background:var(--exact)"></i>exact (Onsager, infinite lattice)</span>
+    <span><i class="swatch" style="background:var(--mf)"></i>mean field</span>
+    <span><i class="swatch" style="background:var(--up)"></i>simulation $L=64$</span>
+    <span><i class="swatch" style="background:transparent;border:1.5px solid var(--up)"></i>simulation $L=32$</span>
+    <span><i class="swatch" style="background:var(--hot);border-radius:50%"></i>live simulator</span>
+  </div>
+  <p class="hint" id="mT-hint">Simulation points: Swendsen–Wang cluster Monte Carlo on periodic $L\times L$
+  lattices (<code>ep01_ising/compute/web_data.py</code>). Finite lattices round off the corner: the larger $L$, the
+  sharper. The specific heat $C = \mathrm{Var}(E)/(N T^2)$ diverges like $\ln|T-T_c|$; mean field predicts a mere jump.</p>
+</div>
+
+<!-- ============================================================ 3. free energy -->
+<h2 id="s3"><span class="num">3</span>The landscape: a bowl that splits</h2>
+<p>How likely is a lattice of magnetisation $m$? Roughly $e^{-N f(m)/T}$, where the free energy $f$ trades energy
+(agreement wants $|m|$ large) against entropy (there are many more ways to be mixed). In mean field,
+$$f(m) = -2m^2 - hm + T\Big[\tfrac{1+m}{2}\ln\tfrac{1+m}{2} + \tfrac{1-m}{2}\ln\tfrac{1-m}{2}\Big].$$
+Above $T=4$ it is a single bowl centred on $m=0$; below, the bottom pops up and two valleys appear at $\pm m^*$.
+This is the <a href="https://romainmorleghem.github.io/rare-events/ep1/">rate-function bowl of the Rare Events
+series</a>, split in two by the interactions.</p>
+<div class="widget" id="fe-widget">
+  <canvas id="fe"></canvas>
+  <div class="controls">
+    <label>$T$ <input type="range" id="feT" min="0.5" max="6" step="0.01" value="3" aria-label="temperature"><output id="feT-o"></output></label>
+    <label>field $h$ <input type="range" id="feh" min="-0.5" max="0.5" step="0.01" value="0" aria-label="field"><output id="feh-o"></output></label>
+  </div>
+  <div class="readout" id="fe-read"></div>
+</div>
+
+<!-- ============================================================ 4. block spins -->
+<h2 id="s4"><span class="num">4</span>Block spins: zooming out</h2>
+<p>Replace every $2\times2$ block by a single spin that takes the majority vote (a coin flip on ties) and repeat.
+Each panel below shows the <em>same number</em> of spins, so each step is a zoom-out by a factor 2. Below $T_c$ the
+picture turns uniform, above it turns into noise; at $T_c$ it looks the same at every scale. That fixed point is
+the heart of Kadanoff's and Wilson's <em>renormalisation group</em>: the blocks feed on the live lattice above.</p>
+<div class="widget" id="blk-widget">
+  <div class="blocks">
+    <figure><canvas id="b0" class="px"></canvas><figcaption id="b0-c">original</figcaption></figure>
+    <figure><canvas id="b1" class="px"></canvas><figcaption id="b1-c">1 step</figcaption></figure>
+    <figure><canvas id="b2" class="px"></canvas><figcaption id="b2-c">2 steps</figcaption></figure>
+    <figure><canvas id="b3" class="px"></canvas><figcaption id="b3-c">3 steps</figcaption></figure>
+  </div>
+  <div class="controls">
+    <button id="blk-tc">Set $T = T_c$</button><button id="blk-lo">Set $T = 2.0$</button><button id="blk-hi">Set $T = 2.6$</button>
+    <span id="blk-T"></span>
+  </div>
+  <p class="hint">Run the simulator with Wolff clusters for an honest picture at $T_c$: Metropolis needs a long time to
+  build the largest domains.</p>
+</div>
+
+<!-- ============================================================ 5. structure factor -->
+<h2 id="s5"><span class="num">5</span>What light sees: critical opalescence</h2>
+<p>Light scattered by a material at an angle measures density (here: spin) fluctuations at one wavelength: the
+<em>structure factor</em>
+$$S(\mathbf k) = \tfrac1N\Big|\sum_{\mathbf r} (s_{\mathbf r}-\bar s)\, e^{-i\mathbf k\cdot\mathbf r}\Big|^2.$$
+Long wavelengths sit at the centre of the right panel. Hot: fluctuations are small and short, a dim haze. Cold:
+almost nothing fluctuates, darkness. At $T_c$ fluctuations of every size appear, $S(k)\sim k^{-7/4}$, and the centre
+glows: this is why a fluid at its critical point turns milky.</p>
+<div class="widget" id="fft-widget">
+  <div class="fftwrap">
+    <figure><canvas id="fsp" class="px"></canvas><figcaption id="fsp-c">spins (window of the live lattice)</figcaption></figure>
+    <figure><canvas id="fft" class="px"></canvas><figcaption>$|\text{Fourier transform}|^2$, log scale</figcaption>
+      <div class="cbar" id="cbar"></div></figure>
+    <div style="flex:1 1 200px;min-width:0">
+      <div class="stats"><div>temperature<b id="fft-T">–</b></div><div>glow at small $k$<b id="fft-g">–</b></div></div>
+      <div class="controls"><button id="fft-tc">Set $T = T_c$</button><button id="fft-hi">Set $T = 3.5$</button><button id="fft-lo">Set $T = 1.8$</button></div>
+      <p class="hint">“Glow” is the mean of $S$ over the few smallest wavevectors, averaged over time. Try sweeping
+      $T$ through $T_c$ with Wolff clusters on: it peaks just above $T_c$ on a finite lattice.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ 6. Hopfield -->
+<h2 id="s6"><span class="num">6</span>Memories as valleys: the Hopfield network</h2>
+<p>In 1982 John Hopfield read the Ising model backwards: choose the couplings $W_{ij}$ so that the patterns you want
+to remember are the low-energy states,
+$$E(s) = -\tfrac12\sum_{i\neq j} W_{ij}\, s_i s_j, \qquad s_i \leftarrow \operatorname{sign}\Big(\sum_j W_{ij} s_j\Big).$$
+Each update can only lower $E$, so a damaged picture rolls downhill into the nearest stored memory. Hebb's rule
+$W=\frac1N\sum_\mu \xi^\mu\xi^{\mu\top}$ gets confused by similar drawings; the pseudo-inverse rule removes their
+overlap first. Hopfield shared the 2024 Nobel Prize in Physics with Geoffrey Hinton for this line of work.</p>
+<div class="widget" id="hop-widget">
+  <div class="hop">
+    <div class="draw">
+      <canvas id="hop" class="px paint" width="64" height="64" aria-label="Hopfield network state. Draw on it."></canvas>
+      <div class="readout" id="hop-read"></div>
+    </div>
+    <div class="mem">
+      <div class="controls" style="margin-top:0">
+        <span class="seg" id="pen" role="group" aria-label="pen colour"><button data-p="1" class="on" aria-pressed="true">pen ▲</button><button data-p="-1" aria-pressed="false">eraser ▼</button></span>
+        <button id="hclear">Clear</button>
+      </div>
+      <div class="controls">
+        <span>presets</span><button data-g="smile">smile</button><button data-g="heart">heart</button><button data-g="pi">π</button>
+      </div>
+      <div class="controls">
+        <button id="store">Store</button><button id="corrupt">Corrupt 30%</button><button id="recall">Recall</button><button id="forget">Forget all</button>
+      </div>
+      <div class="controls">
+        <span>rule</span>
+        <span class="seg" id="rule" role="group" aria-label="learning rule"><button data-r="pinv" class="on" aria-pressed="true">pseudo-inverse</button><button data-r="hebb" aria-pressed="false">Hebb</button></span>
+      </div>
+      <p class="hint" style="margin-top:14px">Stored memories (up to 5) and the overlap $\frac1N\sum_i \xi^\mu_i s_i$ of the
+      current state with each:</p>
+      <div class="memgrid" id="mems"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ 7. going further -->
+<h2 id="s7"><span class="num">7</span>Going further</h2>
+<details>
+  <summary>Kramers–Wannier duality: where $T_c$ comes from</summary>
+  <p>Draw the domain walls of a configuration: they form closed loops on the dual lattice, and the weight of a loop
+  configuration is $e^{-2\beta\,\ell}$ with $\ell$ the total length. Expanding $e^{\beta s_is_j}$ in powers of
+  $\tanh\beta$ also produces closed loops, with weight $(\tanh\beta)^\ell$. So the low-temperature model at $\beta$ is
+  the high-temperature model at $\beta^*$ with
+  $$e^{-2\beta^*} = \tanh\beta \iff \sinh(2\beta)\sinh(2\beta^*) = 1.$$
+  A unique transition must sit at the self-dual point $\sinh(2/T_c) = 1$, i.e. $T_c = 2/\ln(1+\sqrt2)$ (1941, three years
+  before Onsager confirmed it).</p>
+</details>
+<details>
+  <summary>Peierls' argument: why 2D orders and 1D does not</summary>
+  <p>In 1D a single domain wall costs $2J$ but can sit at any of $N$ places: entropy $\ln N$ wins, so there is no
+  order at any $T>0$ (Ising's 1925 result). In 2D a wall around an island of perimeter $\ell$ costs $2J\ell$, and
+  there are at most about $3^\ell$ such walls (a self-avoiding walk chooses between 3 directions per step). The wall
+  free energy per unit length is
+  $$2J - T\ln 3 > 0 \quad\text{for } T < \frac{2}{\ln 3}\approx 1.82,$$
+  so large islands are exponentially rare and the lattice stays ordered: a rigorous lower bound on $T_c \approx 2.27$.</p>
+</details>
+<details>
+  <summary>Critical exponents and universality</summary>
+  <p>Near $T_c$, $m\sim(T_c-T)^\beta$ and the correlation length $\xi\sim|T-T_c|^{-\nu}$. The exponents do not depend
+  on the lattice or the material, only on the dimension and the symmetry: liquid–gas critical points and binary alloys
+  share the 3D Ising values.</p>
+  <div class="tablewrap"><table>
+    <tr><th>exponent</th><th>2D Ising (exact)</th><th>3D Ising (numerical)</th><th>mean field</th></tr>
+    <tr><td>$\beta$ (magnetisation)</td><td>1/8</td><td>≈ 0.326</td><td>1/2</td></tr>
+    <tr><td>$\nu$ (correlation length)</td><td>1</td><td>≈ 0.630</td><td>1/2</td></tr>
+    <tr><td>$\eta$ ($S(k)\sim k^{-2+\eta}$)</td><td>1/4</td><td>≈ 0.036</td><td>0</td></tr>
+  </table></div>
+</details>
+<details>
+  <summary>Cluster algorithms vs critical slowing down</summary>
+  <p>Metropolis flips one spin at a time, so turning over a domain of size $\xi$ takes a time $\tau\sim\xi^{z}$ with
+  $z\approx 2.17$: at $T_c$ on an $L\times L$ lattice, $\tau\sim L^{2.17}$. Swendsen and Wang (1987) and Wolff (1989)
+  instead connect equal neighbours with probability
+  $$p = 1 - e^{-2/T}$$
+  and flip whole clusters. These clusters are exactly the critical droplets, so $z$ drops to about $0.25$ (or less):
+  the right move for the right scale. All the simulation points on this page were made that way.</p>
+</details>
+<details>
+  <summary>Interfaces at $T_c$: SLE(3) curves of dimension 11/8</summary>
+  <p>Fix the spins up on one half of the boundary of a domain and down on the other: a single interface runs between
+  the two. At $T_c$, in the limit of a fine lattice, it converges to a random fractal curve, the
+  <em>Schramm–Loewner evolution</em> SLE$_\kappa$ with $\kappa=3$, of Hausdorff dimension
+  $$d = 1 + \frac{\kappa}{8} = \frac{11}{8}.$$
+  Stanislav Smirnov proved this conformal invariance (Fields Medal 2010), turning physicists' predictions into theorems.</p>
+</details>
+
+<!-- ============================================================ 8. history -->
+<h2 id="s8"><span class="num">8</span>A short history</h2>
+<ol class="timeline">
+  <li><b>1920</b>Wilhelm Lenz proposes the model to explain ferromagnetism.</li>
+  <li><b>1925</b>His student Ernst Ising solves it in 1D: no transition. He wrongly guesses the same in every dimension.</li>
+  <li><b>1936</b>Rudolf Peierls shows that in 2D the order survives at low temperature.</li>
+  <li><b>1941</b>Hendrik Kramers and Gregory Wannier locate $T_c$ exactly with duality.</li>
+  <li><b>1944</b>Lars Onsager solves the 2D model exactly: free energy, $T_c$, and a log-divergent specific heat.</li>
+  <li><b>1952</b>Chen Ning Yang proves the formula for the spontaneous magnetisation, exponent 1/8.</li>
+  <li><b>1953</b>Metropolis, the Rosenbluths and the Tellers invent the Monte Carlo rule used on this page.</li>
+  <li class="nobel"><b>1966–71</b>Leo Kadanoff's block spins, then Kenneth Wilson's renormalisation group (Nobel Prize 1982).</li>
+  <li class="nobel"><b>1982</b>John Hopfield turns the model into an associative memory (Nobel Prize 2024, with Geoffrey Hinton).</li>
+</ol>
+<p class="hint">Everything on this page runs in your browser; the simulation points are computed in
+<code>ep01_ising/compute/web_data.py</code> (<a href="../data/ep1.json">data</a>). Source:
+<a href="https://github.com/romainmorleghem/ising">github.com/romainmorleghem/ising</a>.</p>
+</main>
+<script type="module" src="ep1.js"></script>
+</body>
+</html>
