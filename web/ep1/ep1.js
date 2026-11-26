@@ -70,7 +70,9 @@ function stepSim() {
   const t0 = performance.now(), spf = +$("spf").value, wolff = segValue($("algo"), "a") === "wolff";
   if (wolff) {
     // spread the work in chunks and stop early if the frame budget (≈ 12 ms) is spent
-    for (let k = 0; k < spf; k++) { sim.wolff(sim.N / 2); if (performance.now() - t0 > 12) break; }
+    // budget counted in visited spins (a big cluster can overshoot one chunk: it is charged in full)
+    let left = spf * sim.N / 8;
+    while (left > 0 && performance.now() - t0 < 12) left -= sim.wolff(Math.min(left, sim.N / 8));
     if (h === 0) {      // global spin flip is an exact symmetry at h = 0: keep the colours steady
       const m = sim.stats().m, sg = Math.sign(m);
       if (Math.abs(m) > 0.3) { if (prevSign && sg === -prevSign) sim.globalFlip(); else prevSign = sg; }

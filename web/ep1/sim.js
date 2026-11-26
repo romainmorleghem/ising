@@ -71,6 +71,7 @@ export class Ising {
       done += n + 4;
     }
     this.x = x;
+    return done;
   }
   globalFlip() { const s = this.s; for (let i = 0; i < this.N; i++) s[i] = -s[i]; }
   // magnetisation and energy per spin
@@ -164,7 +165,7 @@ export class Scatter {
       if (r > 0 && r <= 9) { t += this.S[((di + n) % n) * n + ((dj + n) % n)]; c++; } }
     return t / c; }
   // log-scaled image, fftshifted so long wavelengths sit in the centre
-  render(img32, lut, lo = -1.5, hi = 3) {
+  render(img32, lut, lo = -0.5, hi = 2.5) {
     const n = this.n, h = n >> 1, S = this.S;
     for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
       const v = (Math.log10(S[i * n + j] + 1e-9) - lo) / (hi - lo);
