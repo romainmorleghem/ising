@@ -134,7 +134,7 @@ class MeanField(Narrated):
             curves.add(grp)
             keys.add(VGroup(Line_(c), MathTex(("T_c" if abs(T_ - 2.269) < 0.01 else f"T={T_:.1f}"), font_size=28, color=FG)).arrange(RIGHT, buff=0.12))
         keys.arrange(DOWN, buff=0.18, aligned_edge=LEFT).next_to(ax3, RIGHT, buff=0.3)
-        title = Tex(r"measured in simulations ($16\times16$)", font_size=32, color=MUTED).next_to(ax3, UP, buff=0.25)
+        title = Tex(r"measured in\\simulations\\($16\times16$)", font_size=30, color=MUTED).next_to(keys, UP, buff=0.4)
         self.say("And here is the real thing, measured in simulations: the probability of each magnetisation. "
                  "The bowl does split in two.",
                  Create(ax3), FadeIn(labs3), FadeIn(title), FadeIn(keys),
