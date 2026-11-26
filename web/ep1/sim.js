@@ -22,11 +22,13 @@ export class Ising {
   fill(v) { this.s.fill(v); }
   setParams(T, h) {
     this.T = T; this.h = h;
-    // Metropolis acceptance thresholds (×2^32) indexed by [spin up?] * 5 + (neighbour sum + 4) / 2
+    // Metropolis acceptance thresholds (×2^32) indexed by [spin up?] * 5 + (neighbour sum + 4) / 2.
+    // ΔE = 0 moves are accepted with probability 1/2 (still detailed balance): with probability 1, the
+    // checkerboard order pushes diagonal domain walls deterministically and a quench orders far too fast.
     this.thr = new Float64Array(10);
     for (let up = 0; up < 2; up++) for (let k = 0; k < 5; k++) {
       const si = up ? 1 : -1, sum = 2 * k - 4, dE = 2 * si * (sum + h);
-      this.thr[up * 5 + k] = dE <= 0 ? 4294967296 : Math.exp(-dE / T) * 4294967296;
+      this.thr[up * 5 + k] = dE < 0 ? 4294967296 : dE === 0 ? 2147483648 : Math.exp(-dE / T) * 4294967296;
     }
     this.pAdd = (1 - Math.exp(-2 / T)) * 4294967296;
   }

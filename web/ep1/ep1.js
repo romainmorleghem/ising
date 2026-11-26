@@ -171,8 +171,11 @@ function drawFE() {
   $("feT-o").textContent = t.toFixed(2); $("feh-o").textContent = hh.toFixed(2);
   const f0 = fMF(0, t, 0), ms = Array.from({ length: 801 }, (_, i) => -1 + 2 * i / 800);
   const pts = ms.map(m => [m, fMF(m, t, hh) - f0]);
+  // the vertical scale follows the curve so that the shape stays readable at every T
+  const lo = Math.min(...pts.map(p => p[1])), hi = Math.max(...pts.map(p => p[1])), pad = 0.08 * (hi - lo || 1);
+  P.y = [lo - pad, hi + pad];
   P.clear(); P.axes({ xt: 4, yt: 0, xl: "magnetisation m", yl: "f(m) − f(0)" });
-  P.line([[-1, 0], [1, 0]], C.line, 1);
+  P.line([[-1, 0], [1, 0]], C.line, 1, 1, [3, 4]);
   P.fill(pts, t < 4 ? C.crit : C.hot, 0.12, P.y[1]);
   P.line(pts, t < 4 ? C.crit : C.hot, 2.5);
   // local minima

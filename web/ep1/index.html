@@ -18,7 +18,7 @@
 <p class="hint"><a href="../">Ising</a> · Episode 1</p>
 <h1>The Ising model: the key results</h1>
 <p class="lede">Put a tiny magnet on every square of a grid. Each one only cares about its four neighbours, yet below
-one precise temperature, $T_c = 2/\ln(1+\sqrt2)\approx 2.269$, billions of them agree to point the same way.
+one precise temperature, <span style="white-space:nowrap">$T_c = 2/\ln(1+\sqrt2)\approx 2.269$,</span> billions of them agree to point the same way.
 This page lets you run the model yourself, and see why that temperature is so strange.</p>
 <video class="video" controls preload="metadata" playsinline poster="poster.jpg"><source src="ep01_1080p.mp4" type="video/mp4">Your browser does not support HTML5 video.</video>
 <ol class="chapters" id="chapters">
@@ -78,7 +78,8 @@ melts into noise. Draw an island with the mouse (or your finger) and see whether
   </div>
   <p class="hint">Speed is in sweeps per frame (one sweep = one update attempt per spin). Near $T_c$ Metropolis
   struggles: big domains take forever to turn over (<em>critical slowing down</em>). Wolff flips whole clusters at once
-  and does not care. At $h=0$ the Wolff mode flips the colours back when the whole lattice changes sign, which is an
+  and does not care. Spins are updated in a checkerboard order (all “black” squares, then all “white”), and a flip
+  that costs exactly nothing is accepted half the time, which keeps that order from dragging walls along. At $h=0$ the Wolff mode flips the colours back when the whole lattice changes sign, which is an
   exact symmetry, so the picture does not flash.</p>
 </div>
 
@@ -114,7 +115,7 @@ The orange dot is your live simulator.</p>
 $$f(m) = \underbrace{-2m^2 - hm}_{\text{energy}} \;+\; T\underbrace{\Big[\tfrac{1+m}{2}\ln\tfrac{1+m}{2} + \tfrac{1-m}{2}\ln\tfrac{1-m}{2}\Big]}_{-\,\text{entropy}}.$$
 Above $T=4$ it is a single bowl centred on $m=0$; below, the bottom pops up and two valleys appear at $\pm m^*$.
 This is the <a href="https://romainmorleghem.github.io/rare-events/ep1/">rate-function bowl of the Rare Events
-series</a>, split in two by the interactions.</p>
+series</a>, split in two by the interactions. (The vertical scale adapts to the curve; the dashed line is $f(0)$.)</p>
 <div class="widget" id="fe-widget">
   <canvas id="fe"></canvas>
   <div class="controls">
