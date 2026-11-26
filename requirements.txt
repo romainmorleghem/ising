@@ -1,0 +1,9 @@
+manim>=0.19
+numpy
+scipy
+mpmath
+numba
+matplotlib
+pillow
+kokoro-onnx     # voice-over (model files: see README)
+soundfile
