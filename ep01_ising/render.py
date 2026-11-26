@@ -36,6 +36,8 @@ def main():
     folder = QUALITY[a.q]
     parts = []
     for f, scene in SEQUENCE:
+        if not (HERE / "scenes" / f"{f}.py").exists():
+            continue                     # sequence not written yet
         out = MEDIA / "videos" / f / folder / f"{scene}.mp4"
         todo = not a.no_render and (a.only is None or any(f.startswith(o) for o in a.only))
         if todo or not out.exists():
