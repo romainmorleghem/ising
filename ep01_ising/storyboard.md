@@ -1,4 +1,4 @@
-# Episode 1 — The Ising model: the key results (≈ 20 min)
+# Episode 1 — The Ising model: the key results (≈ 15 min)
 
 Audience: no background (same as Rare Events). Voice-over `af_heart`, no captions.
 Colours: gold = spin up, blue = spin down (the coins of Rare Events).

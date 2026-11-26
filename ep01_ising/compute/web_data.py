@@ -132,15 +132,15 @@ def main():
         "sim": sims,
         # Video chapters: set "t" (seconds) once the final cut is known, and the page turns them into links.
         "chapters": [
-            {"t": None, "title": "Cold open: melting and freezing"},
-            {"t": None, "title": "The model: spins, energy, temperature"},
-            {"t": None, "title": "1D: Ising gets it wrong (1925)"},
-            {"t": None, "title": "2D: Peierls fixes it (1936)"},
-            {"t": None, "title": "Mean field: the bowl splits"},
-            {"t": None, "title": "Onsager (1944) and Yang (1952)"},
-            {"t": None, "title": "At the critical point: no typical size"},
-            {"t": None, "title": "Universality and critical opalescence"},
-            {"t": None, "title": "Legacy: Hopfield's memories, recap"},
+            {"t": 0, "title": "Cold open: melting and freezing"},
+            {"t": 56, "title": "The model: spins, energy, temperature"},
+            {"t": 204, "title": "1D: Ising gets it wrong (1925)"},
+            {"t": 290, "title": "2D: Peierls fixes it (1936)"},
+            {"t": 373, "title": "Mean field: the bowl splits"},
+            {"t": 489, "title": "Onsager (1944) and Yang (1952)"},
+            {"t": 573, "title": "At the critical point: no typical size"},
+            {"t": 685, "title": "Universality and critical opalescence"},
+            {"t": 785, "title": "Legacy: Hopfield's memories, recap"},
         ],
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)

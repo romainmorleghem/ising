@@ -742,39 +742,39 @@
  },
  "chapters": [
   {
-   "t": null,
+   "t": 0,
    "title": "Cold open: melting and freezing"
   },
   {
-   "t": null,
+   "t": 56,
    "title": "The model: spins, energy, temperature"
   },
   {
-   "t": null,
+   "t": 204,
    "title": "1D: Ising gets it wrong (1925)"
   },
   {
-   "t": null,
+   "t": 290,
    "title": "2D: Peierls fixes it (1936)"
   },
   {
-   "t": null,
+   "t": 373,
    "title": "Mean field: the bowl splits"
   },
   {
-   "t": null,
+   "t": 489,
    "title": "Onsager (1944) and Yang (1952)"
   },
   {
-   "t": null,
+   "t": 573,
    "title": "At the critical point: no typical size"
   },
   {
-   "t": null,
+   "t": 685,
    "title": "Universality and critical opalescence"
   },
   {
-   "t": null,
+   "t": 785,
    "title": "Legacy: Hopfield's memories, recap"
   }
  ]
