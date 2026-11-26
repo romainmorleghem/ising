@@ -171,3 +171,54 @@ class SpinGrid(VGroup):
     def delta_E(self, i, j):
         """Energy change (in units of J) if spin (i, j) flips (free boundaries)."""
         return 2 * self.s[i, j] * sum(self.s[a, b] for a, b in self.neighbours(i, j))
+
+
+# --------------------------------------------------------------------------------------------
+# Data files (compute/data.py) and plotting helpers
+# --------------------------------------------------------------------------------------------
+from manim import Axes  # noqa: E402
+from common.style import GRID  # noqa: E402
+
+
+def load(name):
+    return np.load(MEDIA_DATA / f"{name}.npz")
+
+
+def unpack(packed):
+    return np.unpackbits(packed, axis=-1).astype(np.int8) * 2 - 1
+
+
+def lattice_image(s, height=6.0):
+    """±1 array (or bit-packed rows) -> crisp ImageMobject."""
+    if s.dtype == np.uint8:
+        s = unpack(s)
+    img = ImageMobject(_LUT[(s > 0).astype(np.uint8)])
+    img.set_resampling_algorithm(RESAMPLING_ALGORITHMS["nearest"])
+    return img.set(height=height)
+
+
+def rgb_image(rgb, height=6.0, smooth=False):
+    img = ImageMobject(np.asarray(rgb, np.uint8))
+    if not smooth:
+        img.set_resampling_algorithm(RESAMPLING_ALGORITHMS["nearest"])
+    return img.set(height=height)
+
+
+def block2(s, rng):
+    """Majority rule on 2x2 blocks, ties broken at random."""
+    b = s.reshape(s.shape[0] // 2, 2, s.shape[1] // 2, 2).sum(axis=(1, 3))
+    tie = rng.choice(np.array([-1, 1], np.int8), b.shape)
+    return np.where(b == 0, tie, np.sign(b)).astype(np.int8)
+
+
+def axes(x_range, y_range, x_length=6.5, y_length=4.2, x_label=None, y_label=None, tips=False, **kw):
+    ax = Axes(x_range=x_range, y_range=y_range, x_length=x_length, y_length=y_length, tips=tips,
+              axis_config=dict(color=MUTED, stroke_width=2, include_numbers=True, font_size=24,
+                               decimal_number_config=dict(num_decimal_places=kw.pop("decimals", 1), color=MUTED)),
+              **kw)
+    labs = VGroup()
+    if x_label:
+        labs.add(MathTex(x_label, font_size=32, color=FG).next_to(ax.x_axis, DOWN, buff=0.45))
+    if y_label:
+        labs.add(MathTex(y_label, font_size=32, color=FG).next_to(ax.y_axis, UP, buff=0.2))
+    return ax, labs
