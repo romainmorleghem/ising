@@ -25,6 +25,7 @@ from common.style import MUTED
 VOICE = "af_heart"
 SPEED = 1.0                  # Kokoro speed factor (1.0 = natural pace)
 PAUSE = 0.35                 # silence after each sentence, seconds
+ANIM_MAX = 2.5               # default duration of animations played during a sentence
 MODEL_DIR = Path(os.environ.get("KOKORO_DIR", Path.home() / ".cache" / "kokoro"))
 CACHE = Path(__file__).resolve().parents[1] / "media" / "voice"
 
@@ -78,11 +79,11 @@ class NarrationMixin:
         return dur
 
     def say(self, text, *anims, speech=None, run_time=None, pause=PAUSE):
-        """Speak, play `anims` meanwhile (default: over the whole sentence), then wait it out."""
+        """Speak, play `anims` meanwhile (default: at most ANIM_MAX s), then wait the sentence out."""
         dur = self.voice(text, speech)
         left = dur + pause
         if anims:
-            rt = dur if run_time is None else run_time
+            rt = min(dur, ANIM_MAX) if run_time is None else run_time
             self.play(*anims, run_time=max(rt, 0.1))
             left -= rt
         if left > 0.05:

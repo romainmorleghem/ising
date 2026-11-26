@@ -227,12 +227,15 @@ def hopfield():
     np.fill_diagonal(W, 0)
     rng = np.random.default_rng(3)
     out = {"patterns": X.astype(np.int8).reshape(-1, n, n)}
-    for name, k, noise in (("pi", 0, 0.35), ("sigma", 1, 0.40), ("psi", 2, 0.45)):
+    # psi at 48 % noise (seed 3) falls into a spurious mixture state (overlap 0.89 with pi, not a memory)
+    for name, k, noise, sweeps, r in (("pi", 0, 0.35, 2, rng), ("sigma", 1, 0.40, 2, rng),
+                                      ("psi", 2, 0.48, 3, np.random.default_rng(3))):
+        rng = r
         x = X[k].copy()
         x[rng.random(n * n) < noise] *= -1
         frames = [x.copy()]
         t = 0
-        for _ in range(2):
+        for _ in range(sweeps):
             for i in rng.permutation(n * n):
                 x[i] = 1 if W[i] @ x >= 0 else -1
                 t += 1

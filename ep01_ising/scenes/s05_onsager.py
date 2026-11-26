@@ -57,7 +57,7 @@ class Onsager(Narrated):
         tcl = DashedLine(ax.c2p(TC, 0), ax.c2p(TC, 1.0), color=CRITICAL)
         exps = VGroup(MathTex(r"\text{exact: }m\propto (T_c-T)^{1/8}", font_size=40, color=EXACT),
                       MathTex(r"\text{mean field: }m\propto (T_c-T)^{1/2}", font_size=40, color=MEANFIELD)
-                      ).arrange(DOWN, buff=0.25, aligned_edge=LEFT).move_to(ax.c2p(1.2, 0.3))
+                      ).arrange(DOWN, buff=0.25, aligned_edge=LEFT).move_to(ax.c2p(1.15, 0.4))
         self.say("Look at how it vanishes: near T c, like T c minus T, to the power one eighth. "
                  "Mean field says one half. One eighth is so small that the curve drops almost vertically.",
                  Create(tcl), FadeIn(exps))

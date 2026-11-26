@@ -22,7 +22,7 @@ class Legacy(Narrated):
 
         def recall(name, label, txt):
             frames = hp[name]
-            img = lattice_image(frames[0], height=4.0).shift(1.5 * DOWN)
+            img = lattice_image(frames[0], height=3.5).shift(1.9 * DOWN)
             cap = Tex(label, font_size=30, color=MUTED).next_to(img, RIGHT, buff=0.5)
             self.say(txt[0], FadeIn(img), FadeIn(cap))
             d = self.voice(txt[1])
@@ -39,8 +39,8 @@ class Legacy(Narrated):
         box = SurroundingRectangle(pats[best], color=COLD, buff=0.08, stroke_width=5)
         self.say("Recall, by physics.", Create(box))
         self.play(FadeOut(Group(img, cap, box)), run_time=0.6)
-        img, cap = recall("psi", r"45\,\% of spins flipped",
-                          ("Corrupt it too much, though,", "and it gets stuck in a false memory: a blend of several patterns."))
+        img, cap = recall("psi", r"48\,\% of spins flipped",
+                          ("Corrupt it too much, though,", "and it gets stuck in a false memory: a blend of several patterns, none of them stored."))
         self.say("Like ours, its memory has limits.")
         self.play(FadeOut(Group(img, cap, pats, eq)), run_time=0.8)
 
