@@ -43,7 +43,7 @@ class MeanField(Narrated):
                  "That gives one self-consistent equation.", Write(eq),
                  speech="Then the centre spin feels a pull of four m, and its own average must be m again. "
                         "That gives one self-consistent equation: m equals the hyperbolic tangent of four m over T.")
-        self.play(FadeOut(VGroup(*[mob for mob in self.mobjects if mob not in (eq, self.chapter_tag)])),
+        self.play(*[FadeOut(mob) for mob in self.mobjects if mob not in (eq, self.chapter_tag)],
                   eq.animate.move_to([PANEL_X, 2.6, 0]).scale(0.85), run_time=0.8)
 
         # graphical solution
@@ -79,7 +79,10 @@ class MeanField(Narrated):
 
         def fcurve():
             t = T2.get_value()
-            return ax2.plot(lambda m: min(-2 * m * m + t * rate(m), 0.5), x_range=[-0.999, 0.999, 0.005],
+            f = lambda m: -2 * m * m + t * rate(m)
+            xs = np.linspace(0, 0.999, 500)
+            mmax = max(x for x in xs if f(x) <= 0.5)          # stay inside the axes
+            return ax2.plot(f, x_range=[-mmax, mmax, 0.005],
                             color=CRITICAL, stroke_width=4)
         fl = always_redraw(fcurve)
         fe = MathTex(r"f(m)=", r"-2m^2", r"+", r"T\,I(m)", font_size=48).move_to([PANEL_X, 2.3, 0])
@@ -97,7 +100,8 @@ class MeanField(Narrated):
                        "in two: a double well, one valley for each colour.")
         self.play(T2.animate.set_value(2.6), run_time=d + 0.3, rate_func=smooth)
         re = Tex(r"$I(m)$: the rate function of coin flips (\emph{Rare Events}, ep.\,1)", font_size=28,
-                 color=MUTED).move_to([PANEL_X, -1.6, 0])
+                 color=MUTED)
+        re.scale_to_fit_width(min(re.width, 6.0)).move_to([PANEL_X, -1.6, 0])
         self.say("If you've watched Rare Events, you know the entropy part: I of m is exactly the rate "
                  "function of coin flips, the bowl of that episode.", FadeIn(re))
         self.play(FadeOut(VGroup(ax2, labs2, fl, fe, notes, tl2, re)), run_time=0.8)
@@ -135,6 +139,7 @@ class MeanField(Narrated):
                  "The bowl does split in two.",
                  Create(ax3), FadeIn(labs3), FadeIn(title), FadeIn(keys),
                  *[Create(c) for c in curves])
+        self.wait(2.5)
         self.play(FadeOut(VGroup(ax3, labs3, title, keys, curves)), run_time=0.8)
 
         verdict = VGroup(
