@@ -38,7 +38,8 @@ This page lets you run the model yourself, and see why that temperature is so st
 <h2 id="s1"><span class="num">1</span>The lattice, live</h2>
 <p>Each square is a spin, up (<b style="color:var(--up)">gold</b>) or down (<b style="color:var(--down)">blue</b>).
 Neighbours that agree lower the energy; a field $h$ favours one colour:
-$$H = -\sum_{\langle ij\rangle} s_i s_j \;-\; h\sum_i s_i, \qquad P(\text{configuration}) \propto e^{-H/T}.$$
+$$H = -\sum_{\langle ij\rangle} s_i s_j \;-\; h\sum_i s_i,$$
+$$P(\text{configuration}) \propto e^{-H/T}.$$
 The <em>Metropolis</em> rule picks a spin and flips it with probability $\min(1, e^{-\Delta E/T})$: downhill
 always, uphill sometimes, more often when hot. Cool the lattice below $T_c$ and watch domains grow; heat it and it
 melts into noise. Draw an island with the mouse (or your finger) and see whether it shrinks or survives.</p>
@@ -85,7 +86,7 @@ melts into noise. Draw an island with the mouse (or your finger) and see whether
 <h2 id="s2"><span class="num">2</span>Magnetisation: simulation, exact, mean field</h2>
 <p>Below $T_c$ the lattice picks a colour: the spontaneous magnetisation $m$ is not zero. Onsager (1944) and Yang
 (1952) found it exactly,
-$$m(T) = \big(1-\sinh(2/T)^{-4}\big)^{1/8}\quad (T<T_c),$$
+$$m(T) = \big(1-\sinh(2/T)^{-4}\big)^{1/8}\quad (T &lt; T_c),$$
 so $m \sim (T_c-T)^{1/8}$ near the transition. The cheap <em>mean-field</em> guess, where every spin feels the
 average of its 4 neighbours, solves $m=\tanh(4m/T)$: right shape, wrong place ($T_c=4$), wrong exponent ($1/2$).
 The orange dot is your live simulator.</p>
@@ -110,7 +111,7 @@ The orange dot is your live simulator.</p>
 <h2 id="s3"><span class="num">3</span>The landscape: a bowl that splits</h2>
 <p>How likely is a lattice of magnetisation $m$? Roughly $e^{-N f(m)/T}$, where the free energy $f$ trades energy
 (agreement wants $|m|$ large) against entropy (there are many more ways to be mixed). In mean field,
-$$f(m) = -2m^2 - hm + T\Big[\tfrac{1+m}{2}\ln\tfrac{1+m}{2} + \tfrac{1-m}{2}\ln\tfrac{1-m}{2}\Big].$$
+$$f(m) = \underbrace{-2m^2 - hm}_{\text{energy}} \;+\; T\underbrace{\Big[\tfrac{1+m}{2}\ln\tfrac{1+m}{2} + \tfrac{1-m}{2}\ln\tfrac{1-m}{2}\Big]}_{-\,\text{entropy}}.$$
 Above $T=4$ it is a single bowl centred on $m=0$; below, the bottom pops up and two valleys appear at $\pm m^*$.
 This is the <a href="https://romainmorleghem.github.io/rare-events/ep1/">rate-function bowl of the Rare Events
 series</a>, split in two by the interactions.</p>
@@ -170,7 +171,8 @@ glows: this is why a fluid at its critical point turns milky.</p>
 <h2 id="s6"><span class="num">6</span>Memories as valleys: the Hopfield network</h2>
 <p>In 1982 John Hopfield read the Ising model backwards: choose the couplings $W_{ij}$ so that the patterns you want
 to remember are the low-energy states,
-$$E(s) = -\tfrac12\sum_{i\neq j} W_{ij}\, s_i s_j, \qquad s_i \leftarrow \operatorname{sign}\Big(\sum_j W_{ij} s_j\Big).$$
+$$E(s) = -\tfrac12\sum_{i\neq j} W_{ij}\, s_i s_j,$$
+$$s_i \leftarrow \operatorname{sign}\Big(\sum_j W_{ij} s_j\Big).$$
 Each update can only lower $E$, so a damaged picture rolls downhill into the nearest stored memory. Hebb's rule
 $W=\frac1N\sum_\mu \xi^\mu\xi^{\mu\top}$ gets confused by similar drawings; the pseudo-inverse rule removes their
 overlap first. Hopfield shared the 2024 Nobel Prize in Physics with Geoffrey Hinton for this line of work.</p>

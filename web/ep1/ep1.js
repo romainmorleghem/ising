@@ -122,7 +122,7 @@ function loop(now) {
 window.__ising = { get fps() { return fps; }, get simMs() { return simMs; }, sim };
 
 // ================================================================ 2. m(T)
-const mTPlot = new Plot($("mT"), { x: [0.5, 5], y: [0, 1.05], aspect: 0.5 });
+const mTPlot = new Plot($("mT"), { x: [0.5, 5], y: [0, 1.05], aspect: w => w < 600 ? 0.75 : 0.5 });
 const Ts = Array.from({ length: 451 }, (_, i) => 0.5 + 4.5 * i / 450);
 const curves = {
   mEx: Ts.map(t => [t, mExact(t)]).concat([[TC, 0], [5, 0]]).sort((a, b) => a[0] - b[0]),
@@ -136,10 +136,11 @@ const cExL = curves.cEx.filter(p => p[0] < TC), cExR = curves.cEx.filter(p => p[
 function drawMT() {
   const P = mTPlot, q = segValue($("mT-seg"), "q");
   P.y = q === "m" ? [0, 1.05] : [0, 2.8];
-  P.clear(); P.axes({ xt: 9, yt: q === "m" ? 5 : 4, xl: "temperature T", yl: q === "m" ? "|m|" : "C per spin",
-    xfmt: v => v.toFixed(1), yfmt: v => v.toFixed(1) });
-  P.vline(TC, C.crit, [4, 4], "T_c ≈ 2.269");
-  P.vline(4, C.mf, [2, 5], "mean-field T_c = 4");
+  const narrow = P.W < 600;
+  P.clear(); P.axes({ xt: narrow ? 3 : 9, yv: q === "m" ? [0, 0.2, 0.4, 0.6, 0.8, 1] : [0, 0.5, 1, 1.5, 2, 2.5],
+    xl: "temperature T", yl: q === "m" ? "|m|" : "C per spin", xfmt: v => v.toFixed(1), yfmt: v => v.toFixed(1) });
+  P.vline(TC, C.crit, [4, 4], narrow ? "T_c" : "T_c ≈ 2.269");
+  P.vline(4, C.mf, [2, 5], narrow ? "MF" : "mean-field T_c = 4");
   if (q === "m") { P.line(curves.mMF, C.mf, 2); P.line(curves.mEx, C.exact, 2.5); }
   else {
     const mf = curves.cMF; P.line(mf.filter(p => p[0] < 4), C.mf, 2); P.line(mf.filter(p => p[0] >= 4), C.mf, 2);
@@ -162,7 +163,7 @@ wireSeg($("mT-seg"), drawMT);
 mTPlot.onresize = drawMT;
 
 // ================================================================ 3. free energy
-const fePlot = new Plot($("fe"), { x: [-1, 1], y: [-1.9, 2.3], aspect: 0.5 });
+const fePlot = new Plot($("fe"), { x: [-1, 1], y: [-1.9, 2.3], aspect: w => w < 600 ? 0.7 : 0.45 });
 function drawFE() {
   const t = +$("feT").value, hh = +$("feh").value, P = fePlot;
   $("feT-o").textContent = t.toFixed(2); $("feh-o").textContent = hh.toFixed(2);
@@ -332,6 +333,7 @@ setT(TC); setH(0); placeTick();
 $("spf-o").textContent = $("spf").value; $("rad-o").textContent = $("rad").value;
 // start near equilibrium at T_c with a few Wolff sweeps so the first picture already shows critical clusters
 for (let k = 0; k < 30; k++) sim.wolff(sim.N);
+sim.render(img32); lctx.putImageData(img, 0, 0); stats = sim.stats(); updateReadouts(); drawTrace(); drawBlocks(); drawScatter();
 requestAnimationFrame(loop);
 fetch("../data/ep1.json").then(r => r.json()).then(F => {
   DATA = F; drawMT();
