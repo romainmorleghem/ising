@@ -29,7 +29,7 @@ const tracePlot = new Plot($("trace"), { x: [0, trace.length], y: [-1, 1], aspec
 function setT(v, fromSlider = false) {
   T = v; if (!fromSlider) $("T").value = v.toFixed(2);
   const atTc = Math.abs(T - TC) < 1e-6;
-  $("T-o").textContent = atTc ? "2.269 = T_c" : T.toFixed(2);
+  $("T-o").textContent = atTc ? "2.269 = Tc" : T.toFixed(2);
   sim.setParams(T, h);
 }
 function setH(v) { h = v; $("h").value = v; $("h-o").textContent = fmtS(h, 2).replace("+0.00", "0").replace("−0.00", "0"); sim.setParams(T, h); }
@@ -95,7 +95,7 @@ function drawTrace() {
   c.fillText("m(t)", P.m[3] + 4, P.m[0]);
 }
 function updateReadouts() {
-  $("st-T").textContent = Math.abs(T - TC) < 1e-6 ? "T_c" : T.toFixed(2);
+  $("st-T").textContent = Math.abs(T - TC) < 1e-6 ? "Tc = 2.269" : T.toFixed(2);
   $("st-m").textContent = fmtS(stats.m);
   $("st-e").textContent = fmtS(stats.e);
   $("st-x").textContent = h === 0 ? mExact(T).toFixed(3) : "h ≠ 0";
@@ -141,7 +141,7 @@ function drawMT() {
   const narrow = P.W < 600;
   P.clear(); P.axes({ xt: narrow ? 3 : 9, yv: q === "m" ? [0, 0.2, 0.4, 0.6, 0.8, 1] : [0, 0.5, 1, 1.5, 2, 2.5],
     xl: "temperature T", yl: q === "m" ? "|m|" : "C per spin", xfmt: v => v.toFixed(1), yfmt: v => v.toFixed(1) });
-  P.vline(TC, C.crit, [4, 4], narrow ? "T_c" : "T_c ≈ 2.269");
+  P.vline(TC, C.crit, [4, 4], narrow ? "Tc" : "Tc ≈ 2.269");
   P.vline(4, C.mf, [2, 5], narrow ? "MF" : "mean-field T_c = 4");
   if (q === "m") { P.line(curves.mMF, C.mf, 2); P.line(curves.mEx, C.exact, 2.5); }
   else {
@@ -211,7 +211,7 @@ function drawBlocks() {
   const lv = [a];
   for (let k = 1; k <= 3; k++) { a = blockSpin(a, n, brand); n >>= 1; lv.push(a); }
   lv.forEach((arr, k) => { const win = crop(arr, sim.L >> k, W); paintSpins(new Uint32Array(bimg[k].data.buffer), win); bctx[k].putImageData(bimg[k], 0, 0); });
-  $("blk-T").textContent = `now T = ${Math.abs(T - TC) < 1e-6 ? "T_c" : T.toFixed(2)}, ${segValue($("algo"), "a") === "wolff" ? "Wolff" : "Metropolis"}`;
+  $("blk-T").textContent = `now T = ${Math.abs(T - TC) < 1e-6 ? "Tc = 2.269" : T.toFixed(2)}, ${segValue($("algo"), "a") === "wolff" ? "Wolff" : "Metropolis"}`;
 }
 const useWolff = () => $("algo").querySelector('[data-a="wolff"]').click();
 $("blk-tc").onclick = () => { setT(TC); useWolff(); };
@@ -233,7 +233,7 @@ function drawScatter() {
   scat.update(win);
   scat.render(new Uint32Array(fimg.data.buffer), MAGMA); fctx.putImageData(fimg, 0, 0);
   paintSpins(new Uint32Array(simg.data.buffer), win); sctx.putImageData(simg, 0, 0);
-  $("fft-T").textContent = Math.abs(T - TC) < 1e-6 ? "T_c" : T.toFixed(2);
+  $("fft-T").textContent = Math.abs(T - TC) < 1e-6 ? "Tc = 2.269" : T.toFixed(2);
   $("fft-g").textContent = scat.smallK().toFixed(0);
 }
 $("cbar").style.background = `linear-gradient(90deg, ${Array.from({ length: 9 }, (_, i) => {
